@@ -33,11 +33,23 @@ const checkJwt = jwt({
   algorithm: ["RS256"]
 });
 
-app.get("/api/external", checkJwt, (req, res) => {
+
+app.get("/api/external", checkJwt, checkPermissionJson('string.read'), (req, res) => {
+  console.log(user);
   res.send({
     msg: "Your access token was successfully validated!"
   });
 });
+
+function checkPermissionJson(scope_required) {
+	return function(req,res,next)
+	{
+		var user = req.user || {};
+		var scopes = user.permissions.concat(user.permissions || []);
+		if(scopes.includes(scope_required)) return next();
+		return res.status(400).json({error:"Insufficient privileges. Need "+scope_required+"; have "+scopes.join(',')})
+	}
+}
 
 app.use((_, res) => {
   res.sendFile(join(__dirname, "build", "index.html"));
