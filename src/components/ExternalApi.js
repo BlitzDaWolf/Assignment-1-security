@@ -5,7 +5,7 @@ import Highlight from "../components/Highlight";
 import { useAuth0 } from "../react-auth0-spa";
 
 const ExternalApi = () => {
-    const [apiMessage, setApiMessage] = useState("");
+    const [apiMessage, setApiMessage] = useState({});
     const { getTokenSilently, user } = useAuth0();
 
     if(!user) return (<div></div>);
@@ -13,7 +13,7 @@ const ExternalApi = () => {
     const callApi = async () => {
         try {
           const token = await getTokenSilently();
-    
+
           const response = await fetch("/api/external", {
             headers: {
               Authorization: `Bearer ${token}`

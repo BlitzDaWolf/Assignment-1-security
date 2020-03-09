@@ -10,9 +10,6 @@ const app = express();
 
 const port = process.env.PORT || process.env.SERVER_PORT || 3001;
 
-const otherport = process.env.PORT || 0;
-console.log(otherport);
-
 if (!authConfig.domain || !authConfig.audience) {
   throw new Error(
     "Please make sure that auth_config.json is in place and populated"
@@ -38,6 +35,7 @@ const checkJwt = jwt({
 
 
 app.get("/api/external", checkJwt, checkPermissionJson('string.read'), (req, res) => {
+  var user = req.user || {};
   res.send({
     msg: "Hello and welcome to the backend API"
   });
