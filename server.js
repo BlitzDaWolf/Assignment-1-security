@@ -8,7 +8,10 @@ const authConfig = require("./src/auth_config.json");
 
 const app = express();
 
-const port = process.env.SERVER_PORT || 3001;
+const port = process.env.PORT || process.env.SERVER_PORT || 3001;
+
+const otherport = process.env.PORT || 0;
+console.log(otherport);
 
 if (!authConfig.domain || !authConfig.audience) {
   throw new Error(
@@ -36,7 +39,7 @@ const checkJwt = jwt({
 
 app.get("/api/external", checkJwt, checkPermissionJson('string.read'), (req, res) => {
   res.send({
-    msg: "Your access token was successfully validated!"
+    msg: "Hello and welcome to the backend API"
   });
 });
 
@@ -46,7 +49,7 @@ function checkPermissionJson(scope_required) {
 		var user = req.user || {};
 		var scopes = user.permissions.concat(user.permissions || []);
 		if(scopes.includes(scope_required)) return next();
-		return res.status(400).json({error:"Insufficient privileges. Need "+scope_required+"; have "+scopes.join(',')})
+		return res.status(400).json({error:"Insufficient privileges."})
 	}
 }
 
