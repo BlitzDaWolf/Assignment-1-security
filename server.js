@@ -7,6 +7,10 @@ const { join } = require("path");
 const authConfig = require("./src/auth_config.json");
 const secrets = require("./secrets.json");
 
+const https = require('https');
+
+const request = require("request");
+
 const app = express();
 
 const port = process.env.PORT || process.env.SERVER_PORT || 3001;
@@ -64,9 +68,12 @@ app.get('/api/getrole', checkJwt, async (req,res) => {
     json: true
   };
   
-  let response = await request(options);
-  let j = await response.json()
-  res.json({msg: "Success"});
+  try{
+    await doRequest(options);
+    res.json({msg: "Success"});
+  }catch(error){
+    res.json({error});
+  }
 });
 
 function checkPermissionJson(scope_required) {
@@ -80,16 +87,26 @@ function checkPermissionJson(scope_required) {
       headers: {authorization: `Bearer ${secrets.token}`}
     };
     
-    const response = await fetch(options.url, options);
-    const json = await response.json();
-    /*let response = await request(options);
-    let j = await response.toJSON();*/
+    let result = await doRequest(options);
+    const json = JSON.parse(result);
 
-		var scopes = user.permissions.concat(user.permissions || []);
-		if(scopes.includes(scope_required)) return next();
+    if(json.find(x => x.permission_name == scope_required) != null) return next();
 		return res.status(400).json({error:"Insufficient privileges."})
 	}
 }
+
+function doRequest(url) {
+  return new Promise(function (resolve, reject) {
+    request(url, function (error, res, body) {
+      if (!error) {
+        resolve(body);
+      } else {
+        reject(error);
+      }
+    });
+  });
+}
+
 
 app.use((_, res) => {
   res.sendFile(join(__dirname, "build", "index.html"));
