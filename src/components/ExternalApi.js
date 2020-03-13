@@ -28,11 +28,31 @@ const ExternalApi = () => {
         }
       };
 
+    const callRole = async () => {
+      try{
+        const token = await getTokenSilently();
+
+        const response = await fetch("/api/getrole", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const responseData = await response.json();
+        setApiMessage(responseData);
+      }catch (error){
+
+      }
+    }
+
     return(
         <>
             <div className="text-center mb-5">
                 <Button color="primary" className="mt-5" onClick={callApi}>
                 Ping API
+                </Button>
+                <Button color="primary" className="mt-5" onClick={callRole}>
+                Ping role
                 </Button>
             </div>
             <div className="result-block-container">

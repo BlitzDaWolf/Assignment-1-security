@@ -5,6 +5,7 @@ const jwt = require("express-jwt");
 const jwksRsa = require("jwks-rsa");
 const { join } = require("path");
 const authConfig = require("./src/auth_config.json");
+const secrets = require("./secrets.json");
 
 const app = express();
 
@@ -36,15 +37,54 @@ const checkJwt = jwt({
 
 app.get("/api/external", checkJwt, checkPermissionJson('string.read'), (req, res) => {
   var user = req.user || {};
+  console.log(user);
   res.send({
     msg: "Hello and welcome to the backend API"
   });
 });
 
+app.get('/api/getrole', checkJwt, async (req,res) => {
+  let userId = req.user.sub;
+  var options = {
+    method: 'POST',
+    url: `https://dev-s5bhvhbd.eu.auth0.com/api/v2/users/${userId}/permissions`,
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bearer ${secrets.token}`,
+      'cache-control': 'no-cache'
+    },
+    body: {
+      permissions: [
+        {
+          resource_server_identifier: 'https://secure-fortress-75188.herokuapp.com',
+          permission_name: 'string.read'
+        }
+      ]
+    },
+    json: true
+  };
+  
+  let response = await request(options);
+  let j = await response.json()
+  res.json({msg: "Success"});
+});
+
 function checkPermissionJson(scope_required) {
-	return function(req,res,next)
+	return async function(req,res,next)
 	{
-		var user = req.user || {};
+    var user = req.user || {};
+    
+    var options = {
+      method: 'GET',
+      url: `https://dev-s5bhvhbd.eu.auth0.com/api/v2/users/${user.sub}/permissions`,
+      headers: {authorization: `Bearer ${secrets.token}`}
+    };
+    
+    const response = await fetch(options.url, options);
+    const json = await response.json();
+    /*let response = await request(options);
+    let j = await response.toJSON();*/
+
 		var scopes = user.permissions.concat(user.permissions || []);
 		if(scopes.includes(scope_required)) return next();
 		return res.status(400).json({error:"Insufficient privileges."})

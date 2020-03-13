@@ -1,9 +1,8 @@
 import React from "react";
 import { useAuth0 } from "../react-auth0-spa";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import {
-    Button
-  } from "reactstrap";
+import { Container, Row, Col , Button} from "reactstrap";
 
 const Profile = () => {
     const { loading, user, loginWithPopup, logout } = useAuth0();
@@ -18,10 +17,24 @@ const Profile = () => {
     }
 
     return (
-        <div>
-            <h2>Welcome {user.nickname}</h2>
-            <Button onClick={() => {logoutWithRedirect()}}>Logout</Button>
-        </div>
+    <Container className="mb-5">
+        <Row className="align-items-center profile-header mb-5 text-center text-md-left">
+          <Col md={2}>
+            <img
+              src={user.picture}
+              alt="Profile"
+              className="rounded-circle img-fluid profile-picture mb-3 mb-md-0"
+            />
+          </Col>
+          <Col md>
+            <h2>{user.name}</h2>
+            <p className="lead text-muted">{user.email}</p>
+          </Col>
+        </Row>
+        <Row>
+            <Button onClick={logoutWithRedirect}><FontAwesomeIcon icon="power-off" className="mr-3" /> Logout</Button>
+        </Row>
+      </Container>
     );
 }
 
