@@ -32,6 +32,7 @@ RUN yarn install --production
 COPY --from=build /app/build ./build
 COPY --from=build /app/src/auth_config.json ./src/auth_config.json
 COPY --from=build /app/server.js .
+COPY --from=build /app/secrets.json .
 
 EXPOSE 3000
 ENV SERVER_PORT=3000
