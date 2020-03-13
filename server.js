@@ -51,7 +51,7 @@ app.get('/api/getrole', checkJwt, async (req,res) => {
   let userId = req.user.sub;
   var options = {
     method: 'POST',
-    url: `https://dev-s5bhvhbd.eu.auth0.com/api/v2/users/${userId}/permissions`,
+    url: `https://${secrets.domain}/api/v2/users/${userId}/permissions`,
     headers: {
       'content-type': 'application/json',
       authorization: `Bearer ${secrets.token}`,
@@ -60,7 +60,7 @@ app.get('/api/getrole', checkJwt, async (req,res) => {
     body: {
       permissions: [
         {
-          resource_server_identifier: 'https://secure-fortress-75188.herokuapp.com',
+          resource_server_identifier: secrets.api,
           permission_name: 'string.read'
         }
       ]
@@ -83,7 +83,7 @@ function checkPermissionJson(scope_required) {
     
     var options = {
       method: 'GET',
-      url: `https://dev-s5bhvhbd.eu.auth0.com/api/v2/users/${user.sub}/permissions`,
+      url: `https://${secrets.domain}/api/v2/users/${user.sub}/permissions`,
       headers: {authorization: `Bearer ${secrets.token}`}
     };
     
