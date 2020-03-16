@@ -82,7 +82,8 @@ app.get('/api/getrole', checkJwt, async (req,res) => {
     let res = await doRequest(options);
     res.json({msg: "Success"});
   }catch(error){
-    res.json({error});
+    console.log(error.message)
+    res.json({});
   }
 });
 
