@@ -28,6 +28,18 @@ To do this, first copy `src/auth_config.json.example` into a new file in the sam
 }
 ```
 
+There is also one part for the server only called `secrets.json`
+```json
+{
+  "domain": "{YOUR AUTH0 DOMAIN}",
+    "api": "{resource_server_identifier}",
+    "tokenDomain": "{TOKEN API DOMAIN}",
+    "client_id":"{API CLIENT ID}",
+    "client_secret":"{CLIENT SECRET}",
+    "audience":"{API AUDIENCE}"
+}
+```
+
 ### Compiles and hot-reloads for development
 
 This compiles and serves the React app, and starts the backend API server on port 3001. Calls to `http://localhost:3000/api/*` routes will be proxied through to the backend:
