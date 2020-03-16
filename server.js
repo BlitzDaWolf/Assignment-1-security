@@ -11,6 +11,16 @@ const https = require('https');
 
 const request = require("request");
 
+let secretToken = "";
+
+async function setToken() {
+  secretToken = await getToken();
+  console.log("Token has been refreshed");
+}
+
+setInterval(setToken, 1800000);
+setToken();
+
 const app = express();
 
 const port = process.env.PORT || process.env.SERVER_PORT || 3001;
@@ -69,7 +79,7 @@ app.get('/api/getrole', checkJwt, async (req,res) => {
   };
   
   try{
-    await doRequest(options);
+    let res = await doRequest(options);
     res.json({msg: "Success"});
   }catch(error){
     res.json({error});
@@ -84,7 +94,7 @@ function checkPermissionJson(scope_required) {
     var options = {
       method: 'GET',
       url: `https://${secrets.domain}/api/v2/users/${user.sub}/permissions`,
-      headers: {authorization: `Bearer ${secrets.token}`}
+      headers: {authorization: `Bearer ${secretToken}`}
     };
     
     let result = await doRequest(options);
@@ -107,6 +117,16 @@ function doRequest(url) {
   });
 }
 
+
+async function getToken() {
+  var options = { method: 'POST',
+    url: secrets.tokenDomain,
+    headers: { 'content-type': 'application/json' },
+    body: `{"client_id":"${secrets.client_id}","client_secret":"${secrets.client_secret}","audience":"${secrets.audience}","grant_type":"client_credentials"}`
+  };
+  let res = await doRequest(options);
+  return JSON.parse(res).access_token;
+}
 
 app.use((_, res) => {
   res.sendFile(join(__dirname, "build", "index.html"));
